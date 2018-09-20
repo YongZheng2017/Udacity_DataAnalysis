@@ -1,0 +1,79 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+	<style type="text/css">
+    h2 { 
+     text-align: center;
+      }
+    </style>
+	<script type="text/javascript">
+	
+	   
+
+        function draw(data) {
+        /*
+        D3.js setup code
+        */
+
+        "use strict";
+        var margin = 75,
+            width = 1400 - margin,
+            height = 600 - margin;
+		
+		d3.select('body')
+	        .append('h2')
+	        .text("泰坦尼克号数据可视化分析");
+
+        var svg1 = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin)
+            .attr("height", height + margin)
+            .append('g')
+            .attr('class','chart');
+			
+		var svg2 = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin)
+            .attr("height", height + margin)
+            .append('g')
+            .attr('class','chart');
+
+        /*
+        Dimple.js Chart construction code
+        */
+
+        var myChart1 = new dimple.chart(svg1, data);
+        var x = myChart1.addCategoryAxis("x", "sex"); 
+        var y = myChart1.addMeasureAxis("y", "survived");
+		var z = myChart1.addSeries("pclass", dimple.plot.bar);
+		z.addOrderRule("pclass")
+		myChart1.addLegend(60,10,510,20,'right');
+        myChart1.draw();
+		
+		var myChart2 = new dimple.chart(svg2, data);
+        var x = myChart2.addCategoryAxis("x", "sex"); 
+        var y = myChart2.addMeasureAxis("y", "survived");
+        var z = myChart2.addSeries("age_group", dimple.plot.bar);;
+		z.addOrderRule("age_group")
+		myChart2.addLegend(60,10,510,20,'right');
+        myChart2.draw();
+		
+		
+        };
+
+    </script>
+</head>
+<body>
+    <br>
+	<script type="text/javascript">
+    /*
+    Use D3 (not dimple.js) to load the CSV file
+    and pass the contents of it to the draw function
+    */
+    d3.csv("titanic_dataset_updated.csv", draw);
+    </script>
+   
+ </body>
+</html>

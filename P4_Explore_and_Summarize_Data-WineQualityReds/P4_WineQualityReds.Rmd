@@ -1,0 +1,263 @@
+红葡萄酒质量分析
+========================================================
+# 一、摘要
+
+本项目对红葡萄酒质量数据集进行分析，分析哪些化学成分会影响葡萄酒的质量。
+
+# 二、分析准备
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+library(ggplot2)
+library(knitr)
+library(dplyr)
+```
+
+```{r echo=FALSE, Load_the_Data}
+# 导入数据
+wine <- read.csv("wineQualityReds.csv")
+```
+查看数据集的数据量
+```{r echo=FALSE}
+# 数据长度
+length(wine$quality)
+```
+
+查看数据概况
+```{r echo=FALSE}
+# 数据情况
+str(wine)
+```
+
+# 三、分析红葡萄酒质量数据
+
+## 3.1 单变量分析
+
+## 分析红葡萄酒质量值的分布情况
+```{r echo=TRUE, Univariate_Plots}
+ggplot(aes(x = quality), data = wine)+
+  geom_histogram(binwidth = 1)
+```
+  
+从图中可以看出，红葡萄酒的质量区间为3~8，大部分酒的质量为5和6，最低质量的酒3和最高质量的酒8记录数相对很少。
+
+```{r echo=TRUE}
+quantile(wine$quality)
+```
+
+
+## 分析alcohol的分布情况
+```{r echo=TRUE}
+ggplot(aes(x = alcohol), data = wine)+
+  geom_histogram(binwidth = 0.5)
+```
+  
+从图可以看出，alcohol主要分布在9-12之间，值为10附近的记录最多。
+
+```{r echo=TRUE}
+quantile(wine$alcohol)
+```
+
+
+## 分析pH的分布情况
+```{r echo=TRUE}
+ggplot(aes(x = pH), data = wine)+
+  geom_histogram(binwidth = 0.1)
+```
+  
+从图中可以看出，pH值主要集中在3.0-3.5之间。
+
+```{r echo=TRUE}
+quantile(wine$pH)
+```
+
+## 分析红葡萄酒free.sulfur.dioxide值的分布情况
+```{r echo=TRUE}
+ggplot(aes(x = free.sulfur.dioxide), data = wine)+
+  geom_histogram(binwidth = 2)
+```
+  
+从图可以看出，free.sulfur.dioxide主要分布在2-40之间，值为6的记录最多。
+
+```{r echo=TRUE}
+quantile(wine$free.sulfur.dioxide)
+```
+
+## 分析红葡萄酒volatile.acidity值的分布情况
+```{r echo=TRUE}
+ggplot(aes(x = volatile.acidity), data = wine)+
+  geom_histogram(binwidth = 0.05)
+```
+  
+从图可以看出，volatile.acidity的值主要集中在0.3-0.7之间。
+
+```{r echo=TRUE}
+quantile(wine$volatile.acidity)
+```
+
+## 单变量分析总结
+### What is the structure of your dataset?
+数据集中有1599条红葡萄酒的质量记录数据，每条记录有12个维度（不包括记录序号）。
+  大部分酒的quality在4-7；
+  quality的中位数为6；
+  alcohol的中位数为10.2；
+  pH的中位数在3.31；
+  free.sulfur.dioxide主要分布在2-40之间，中位数为14；
+  volatile.acidity的中位数为0.52。
+
+### What is/are the main feature(s) of interest in your dataset?
+数据集中的主要特征是quality,我将分析红葡萄酒的quality主要受哪些特征的影响。我怀疑quality值主要受free.sulfur.dioxide和volatile.acidity这两个特征值得影响。
+
+### Did you create any new variables from existing variables in the dataset?
+本次分析没有创建新的变量。
+
+## 3.2 双变量分析
+
+## 分析红葡萄酒的质量和fixed.acidity的关系
+```{r echo=TRUE, warning=FALSE, Bivariate_Plots}
+ggplot(aes(x = quality , y = fixed.acidity), data = wine) +
+  geom_boxplot(aes(group = cut_width(quality, 1)))
+```
+  
+从图中看不出明显的关联关系。
+
+## 分析红葡萄酒的质量和挥发性酸volatile.acidity的关系
+```{r echo=TRUE, warning=FALSE}
+ggplot(aes(x = quality , y = volatile.acidity), data = wine) +
+  geom_boxplot(aes(group = cut_width(quality, 1)))
+```
+  
+从上图可以看出，低质量的红葡萄酒（质量在3-4）的volatile.acidity中位数在0.7-0.9左右，而高质量的红葡萄酒（质量在7-8）的volatile.acidity中位数在0.3-0.4左右，可见volatile.acidity的值越低，酒的质量相对越高。
+
+## 分析红葡萄酒的质量和citric.acid的关系
+```{r echo=TRUE, warning=FALSE}
+ggplot(aes(x = quality , y = citric.acid), data = wine) +
+  geom_boxplot(aes(group = cut_width(quality, 1)))+
+  coord_cartesian(ylim = c(0.01, 0.80))
+
+```
+  
+从上图可以看出，质量越高，citric.acid的中位数也越大。
+
+## 分析红葡萄酒的质量和residual.sugar的关系
+```{r echo=TRUE, warning=FALSE}
+ggplot(aes(x = quality , y = residual.sugar), data = wine) +
+  geom_boxplot(aes(group = cut_width(quality, 1)))+
+  coord_cartesian(ylim = c(0.01, 7.00))
+```
+  
+从图中看不出明显的关联关系。
+
+## 分析红葡萄酒的质量和chlorides的关系
+```{r echo=TRUE, warning=FALSE}
+ggplot(aes(x = quality , y = chlorides), data = wine) +
+  geom_boxplot(aes(group = cut_width(quality, 1)))+
+  coord_cartesian(ylim = c(0.01, 0.30))
+```
+  
+从图中看不出明显的关联关系。但可看出大部分记录的chlorides值集中在0.0-0.2区间。
+
+## 分析红葡萄酒的质量和游离二氧化硫free.sulfur.dioxide的关系
+```{r echo=TRUE}
+ggplot(aes(x = quality , y = free.sulfur.dioxide), data = wine) +
+  geom_jitter(alpha = 0.3)+
+  geom_boxplot(alpha = 0.5, aes(group = cut_width(quality, 1)))
+```
+  
+从上图可以看出，低质量红葡萄酒（质量在3-4）和高质量红葡萄酒（质量在7-8）的free.sulfur.dioxide相对较低，大多数低于40，而中间质量的反而存在比较多free.sulfur.dioxide大于40的情况。
+
+## 分析红葡萄酒的质量和total.sulfur.dioxide的关系
+```{r echo=TRUE}
+ggplot(aes(x = quality , y = total.sulfur.dioxide), data = wine) +
+  geom_jitter(alpha = 0.3)+
+  geom_boxplot(alpha = 0.5, aes(group = cut_width(quality, 1)))
+```
+  
+从上图可以看出，total.sulfur.dioxide与质量的关系和free.sulfur.dioxide类似，高质量和低质量的中位数比较低，而中间质量的反而高。
+
+## 分析红葡萄酒的质量和density的关系
+```{r echo=TRUE}
+ggplot(aes(x = quality , y = density ), data = wine) +
+   geom_boxplot(aes(group = cut_width(quality, 1)))
+```
+  
+从图可以产出，density值集中在0.995-1.000之间，没有明显的趋势。
+
+## 分析红葡萄酒的质量和pH的关系
+```{r echo=TRUE}
+ggplot(aes(x = quality , y = pH), data = wine) +
+  geom_jitter(alpha = 0.3)+
+  geom_boxplot(alpha = 0.5, aes(group = cut_width(quality, 1)))
+```
+  
+从图可以看出，pH值主要分布在3.0-4.0之间，看不出明显的关联关系。
+
+## 分析红葡萄酒的质量和sulphates的关系
+```{r echo=TRUE}
+ggplot(aes(x = quality , y = sulphates), data = wine) +
+  geom_jitter(alpha = 0.3)+
+  geom_boxplot(alpha = 0.5, aes(group = cut_width(quality, 1)))+
+  coord_cartesian(ylim = c(0.1, 1.3))
+```
+  
+从图中可以看出，质量越高，sulphates的中位数越大，但相差不大，中位数都在0.5-0.75区间。
+
+## 分析红葡萄酒的质量和alcohol的关系
+```{r echo=TRUE}
+ggplot(aes(x = quality , y = alcohol), data = wine) +
+  geom_jitter(alpha = 0.3)+
+  geom_boxplot(alpha = 0.5, aes(group = cut_width(quality, 1)))
+```
+  
+从图可以看出，质量高的酒alcohol的中值相对较高。
+
+## 双变量分析总结
+### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
+从上面的分析看，citric.acid，total.sulfur.dioxide，alcohol也和quality值存在关联关系，但我认为quality最主要的还是受free.sulfur.dioxide和volatile.acidity这两个特征影响。
+
+### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+在分析quality与citric.acid，residual.sugar关系的时候，由于存在outlier值，导致箱型图集体偏下，所以增加ylim调整图形，让其不显示outlier。从而更容易观察图形规律。
+
+## 3.3 三变量分析
+
+## 分析红葡萄酒的质量和volatile.acidity，free.sulfur.dioxide两个变量的相关情况
+```{r echo=TRUE, Multivariate_Plots}
+ggplot(aes(x = volatile.acidity, y = free.sulfur.dioxide), data = wine) +
+  geom_point(aes(color = quality), alpha = 0.5, position = 'jitter')+
+  scale_color_gradient(low="white", high="red")
+```
+  
+从上图可以看出，高质量红葡萄酒（质量在7-8）大部分分布在volatile.acidity低于0.6和free.sulfur.dioxide低于40的区域。
+
+# 四、最终成图和汇总
+
+## 4.1 红葡萄酒的质量和volatile.acidity的关系
+```{r echo=TRUE, warning=FALSE}
+ggplot(aes(x = quality , y = volatile.acidity), data = wine) +
+  geom_boxplot(aes(group = cut_width(quality, 1)))
+```
+  
+从图中可以看出，酒的质量越好，volatile.acidity的值相对月底。
+
+## 4.2 红葡萄酒的质量和free.sulfur.dioxide的关系
+```{r echo=TRUE}
+ggplot(aes(x = quality , y = free.sulfur.dioxide), data = wine) +
+  geom_jitter(alpha = 0.3)+
+  geom_boxplot(alpha = 0.5, aes(group = cut_width(quality, 1)))
+```
+  
+从图中可以看出，质量好和质量差的酒free.sulfur.dioxide值相对较低，而中间质量的酒free.sulfur.dioxide值相对较高。
+
+## 4.3 红葡萄酒的质量和volatile.acidity，free.sulfur.dioxide两个变量的相关情况
+```{r echo=TRUE}
+ggplot(aes(x = volatile.acidity, y = free.sulfur.dioxide), data = wine) +
+  geom_point(aes(color = quality), alpha = 0.5, position = 'jitter')+
+  scale_color_gradient(low="white", high="red")
+```
+  
+从图中可以看出，高质量红葡萄酒（质量在7-8）大部分分布在volatile.acidity低于0.6和free.sulfur.dioxide低于40的区域。
+
+# 五、结论与反思
+从上面的分析可以看出，好质量的红葡萄酒volatile.acidity和free.sulfur.dioxide值都比较低，volatile.acidity低于0.6和free.sulfur.dioxide低于40；而质量的红葡萄酒虽然大部分free.sulfur.dioxide也低于40，但volatile.acidity大部分高于0.5。  
+  
+在对本数据集的分析过程中，开始阶段没有发现质量与其它变量有比较明显的联系，在做出每一个变量与质量的可视化图形，并查阅了红酒质量相关的文章后，才发现了质量与volatile.acidity，free.sulfur.dioxide之间比较明显的关联关系。
+  
+本文只分析了三变量之间的关系，但质量可能同时受到多个变量的影响，进一步我们还可以分析质量同时与多个变量（大于三）之间的关系，并分析每个变量对质量的影响程度大小。
